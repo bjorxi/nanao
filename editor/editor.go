@@ -3,6 +3,7 @@ package editor
 import "os"
 import "fmt"
 import "bufio"
+import "strconv"
 import "unsafe"
 import "syscall"
 import "../terminal"
@@ -43,12 +44,29 @@ func (e *NanaoEditor) Edit() {
 
 
 func (e *NanaoEditor) RefreshScreen() {
-  fmt.Println()
   var row Row
-  for i := 0; i < len(e.rows); i++ {
+
+  output := "" /* #TODO replace string with bytes.Buffer */
+  output += "\x1b[?25l" /* Hide cursor. */
+  output += "\x1b[H" /* Go home. */
+  numOfRows := len(e.rows)
+
+  for i := 0; i < numOfRows; i++ {
     row = e.rows[i]
-    fmt.Printf("%d %s\n", row.number, row.content)
+    output += row.content + "\x1b[39m" + "\x1b[0K"
+
+    if i < numOfRows - 1 {
+      output += "\r\n"
+    }
   }
+
+  x := strconv.Itoa(int(e.cursorXPos))
+  y := strconv.Itoa(int(e.cursorYPos))
+
+  output +=  "\r\nmoving cursor x: " + x + " y: " +  y + "|| " + "x1b["+y+";"+x+"f"
+  output += "\x1b["+y+";"+x+"f"
+  output += "\x1b[?25h" /* Show cursor. */
+  fmt.Printf("%s", output)
 }
 
 
@@ -67,33 +85,45 @@ func (e *NanaoEditor) ProcessKeyPress() {
   case 10: /* enter */
     fmt.Println()
   case 27, 91:
-    return
+    return /* #TODO handle this cases more efficient, now it forces screenRefresh */
   case 68: /* left arrow */
-    fmt.Println("Left")
+    e.moveCursorLeft()
   case 67: /* right arrow */
-    fmt.Println("Right")
+    e.moveCursorRight()
   case 65: /* up arrow */
-    fmt.Println("Up")
+    e.moveCursorUp()
   case 66: /* down arrow */
-    fmt.Println("Down")
+    e.moveCursorDown()
   }
 }
 
 
 func (e *NanaoEditor) moveCursorUp () {
-  e.cursorYPos++
+  if e.cursorYPos <= 0 {
+    e.cursorYPos = 0
+  } else {
+    e.cursorYPos--
+    // fmt.Println("\x1b[1A")
+  }
 }
 
 func (e *NanaoEditor) moveCursorDown () {
-  e.cursorYPos--
+  e.cursorYPos++
+  // fmt.Println("\x1b[1B")
 }
 
 func (e *NanaoEditor) moveCursorLeft () {
-  e.cursorXPos--
+  if e.cursorXPos <= 0 {
+    e.cursorXPos = 0
+  } else {
+    e.cursorXPos--
+  }
+  // fmt.Println("\x1b[1D")
 }
 
 func (e *NanaoEditor) moveCursorRight () {
   e.cursorXPos++
+  // fmt.Println("\x1b[1C")
 }
 
 func (e *NanaoEditor) GetNumOfRows() {
@@ -124,6 +154,8 @@ func (e NanaoEditor) getWingowSize() {
 
 func Init() Editor {
   e := &NanaoEditor{}
+  e.cursorXPos = 0
+  e.cursorYPos = 0
   e.getWingowSize()
   e.isChanged = false
   e.termOldState, _ = terminal.MakeRaw(0)
