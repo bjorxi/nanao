@@ -29,6 +29,8 @@ func (e *NanaoEditor) Open(path string) {
     content = scanner.Text()
     e.rows = append(e.rows, Row{rowNum, content, len(content)})
   }
+
+  e.file.Close()
 }
 
 
