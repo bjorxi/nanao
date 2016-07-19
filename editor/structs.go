@@ -25,6 +25,8 @@ type NanaoEditor struct {
   cursorYPos uint32 /* cursor y position */
   screenRows int32 /* Number of rows */
   screenCols int32 /* Number of columns */
+  rowsOffset int32
+  colsOffset int32
   isChanged bool /* Has a file been changed? */
   fileName string
   filePath string
