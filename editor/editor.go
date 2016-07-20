@@ -84,8 +84,6 @@ func (e *NanaoEditor) ProcessKeyPress() {
   fmt.Scanf("%c", &keyPress)
   fmt.Println("Key pressed", keyPress)
   switch keyPress {
-  default:
-    fmt.Printf("%c", keyPress)
   case 3:
     fmt.Println("^C")
     terminal.Restore(0, e.termOldState)
@@ -102,10 +100,26 @@ func (e *NanaoEditor) ProcessKeyPress() {
     e.moveCursorUp()
   case 66: /* down arrow */
     e.moveCursorDown()
+    default:
+      e.insertChar(keyPress)
   }
 }
 
 
+func (e *NanaoEditor) insertChar (char int) {
+  currRow := e.rows[0]
+  currRowContent := currRow.content.Bytes()
+
+  newBuffer := bytes.NewBuffer(nil)
+
+  newBuffer.Write(currRowContent[:e.cursorXPos])
+  newBuffer.Write([]byte(strconv.Itoa(char)))
+  newBuffer.Write(currRowContent[e.cursorXPos:])
+
+  e.rows[e.cursorYPos].content = newBuffer
+  e.rows[e.cursorYPos].size = newBuffer.Len()
+  e.moveCursor(e.cursorXPos+1, e.cursorYPos)
+}
 func (e *NanaoEditor) moveCursorUp () {
   if e.cursorYPos <= 0 {
     e.cursorYPos = 0
