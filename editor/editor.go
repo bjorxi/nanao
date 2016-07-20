@@ -179,7 +179,12 @@ func (e *NanaoEditor) moveCursorLeft () {
 
 func (e *NanaoEditor) moveCursorRight () {
   e.cursorXPos++
-  // fmt.Println("\x1b[1C")
+
+  currRowSize := uint32(e.rows[e.cursorYPos-1].size + e.cursorXOffset - 1)
+
+  if e.cursorXPos >= currRowSize {
+    e.cursorXPos = currRowSize
+  }
 }
 
 func (e *NanaoEditor) GetNumOfRows() {
