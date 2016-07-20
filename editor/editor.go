@@ -102,7 +102,25 @@ func (e *NanaoEditor) ProcessKeyPress() {
     e.moveCursorDown()
     default:
       e.insertChar(keyPress)
+    case 13: /* enter */
+      e.insertEmptyRow()
   }
+}
+
+
+func (e *NanaoEditor) insertEmptyRow() {
+  var rows []Row
+  newBuffer := bytes.NewBuffer(nil)
+  newRow := Row{e.cursorYPos+1, newBuffer, newBuffer.Len()}
+
+  rows = append(rows, e.rows[:e.cursorYPos]...)
+  rows = append(rows, newRow)
+  rows = append(rows, e.rows[e.cursorYPos:]...)
+
+  e.rows = rows
+  e.totalRowsNum++
+
+  e.moveCursor(uint32(e.cursorXOffset), e.cursorYPos+1)
 }
 
 
