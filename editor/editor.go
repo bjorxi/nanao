@@ -120,6 +120,13 @@ func (e *NanaoEditor) insertChar (char int) {
   e.rows[e.cursorYPos].size = newBuffer.Len()
   e.moveCursor(e.cursorXPos+1, e.cursorYPos)
 }
+
+
+func (e *NanaoEditor) moveCursor(x, y uint32) {
+  e.cursorXPos = x
+  e.cursorYPos = y
+}
+
 func (e *NanaoEditor) moveCursorUp () {
   if e.cursorYPos <= 0 {
     e.cursorYPos = 0
