@@ -111,8 +111,15 @@ func (e *NanaoEditor) ProcessKeyPress() {
 
 func (e *NanaoEditor) insertEmptyRow() {
   var rows []Row
-  newBuffer := bytes.NewBuffer(nil)
+
+  currRow := e.rows[e.cursorYPos-1]
+  currRowContent := currRow.content.Bytes()
+  sliceAt := e.cursorXPos - uint32(e.cursorXOffset)
+
+  newBuffer := bytes.NewBuffer(currRowContent[sliceAt:])
   newRow := Row{e.cursorYPos+1, newBuffer, newBuffer.Len()}
+
+  e.rows[e.cursorYPos-1] = Row{e.cursorYPos-1, bytes.NewBuffer(currRowContent[:sliceAt]), 1}
 
   rows = append(rows, e.rows[:e.cursorYPos]...)
   rows = append(rows, newRow)
@@ -172,7 +179,12 @@ func (e *NanaoEditor) moveCursorLeft () {
 
 func (e *NanaoEditor) moveCursorRight () {
   e.cursorXPos++
-  // fmt.Println("\x1b[1C")
+
+  currRowSize := uint32(e.rows[e.cursorYPos-1].size + e.cursorXOffset - 1)
+
+  if e.cursorXPos >= currRowSize {
+    e.cursorXPos = currRowSize
+  }
 }
 
 func (e *NanaoEditor) GetNumOfRows() {
@@ -205,7 +217,7 @@ func Init() Editor {
   e := &NanaoEditor{}
   e.cursorXOffset = 4
   e.cursorXPos = uint32(e.cursorXOffset)
-  e.cursorYPos = 0
+  e.cursorYPos = 1
   e.getWingowSize()
   e.isChanged = false
   e.termOldState, _ = terminal.MakeRaw(0)
