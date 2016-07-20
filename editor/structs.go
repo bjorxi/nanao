@@ -1,7 +1,8 @@
 package editor
 
-import "os"
+import "bytes"
 import "../terminal"
+
 
 type Editor interface {
   Open(path string)
@@ -23,6 +24,7 @@ type Editor interface {
 type NanaoEditor struct {
   cursorXPos uint32 /* cursor x position */
   cursorYPos uint32 /* cursor y position */
+  cursorXOffset int
   screenRows int32 /* Number of rows */
   screenCols int32 /* Number of columns */
   rowsOffset int32
@@ -30,15 +32,15 @@ type NanaoEditor struct {
   isChanged bool /* Has a file been changed? */
   fileName string
   filePath string
-  file *os.File
-  rows []Row
-  termOldState *terminal.State
+  rows []Row /* File content */
+  totalRowsNum int
+  termOldState *terminal.State /* TODO: move it somewhere */
 }
 
 
 type Row struct {
   number uint32
-  content string
+  content *bytes.Buffer
   size int
 }
 
