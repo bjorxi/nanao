@@ -21,8 +21,6 @@ func (e *NanaoEditor) Open(path string) {
     os.Exit(1)
   }
 
-  e.file = file
-
   var rowNum uint32 = 0
   var content *bytes.Buffer
 
@@ -33,7 +31,7 @@ func (e *NanaoEditor) Open(path string) {
     e.rows = append(e.rows, Row{rowNum, content, content.Len()})
   }
 
-  e.file.Close()
+  file.Close()
 }
 
 

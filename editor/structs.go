@@ -1,6 +1,5 @@
 package editor
 
-import "os"
 import "bytes"
 import "../terminal"
 
@@ -32,7 +31,6 @@ type NanaoEditor struct {
   isChanged bool /* Has a file been changed? */
   fileName string
   filePath string
-  file *os.File
   rows []Row
   termOldState *terminal.State
 }
