@@ -146,8 +146,8 @@ func (e *NanaoEditor) moveCursor(x, y uint32) {
 }
 
 func (e *NanaoEditor) moveCursorUp () {
-  if e.cursorYPos <= 0 {
-    e.cursorYPos = 0
+  if e.cursorYPos <= 1 {
+    e.cursorYPos = 1
   } else {
     e.cursorYPos--
     // fmt.Println("\x1b[1A")
@@ -160,8 +160,9 @@ func (e *NanaoEditor) moveCursorDown () {
 }
 
 func (e *NanaoEditor) moveCursorLeft () {
-  if e.cursorXPos <= 0 {
-    e.cursorXPos = 0
+
+  if e.cursorXPos <= uint32(e.cursorXOffset) {
+    e.cursorXPos = uint32(e.cursorXOffset)
   } else {
     e.cursorXPos--
   }
@@ -201,7 +202,8 @@ func (e NanaoEditor) getWingowSize() {
 
 func Init() Editor {
   e := &NanaoEditor{}
-  e.cursorXPos = 0
+  e.cursorXOffset = 4
+  e.cursorXPos = uint32(e.cursorXOffset)
   e.cursorYPos = 0
   e.getWingowSize()
   e.isChanged = false
