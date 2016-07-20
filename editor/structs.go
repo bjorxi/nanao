@@ -1,7 +1,9 @@
 package editor
 
 import "os"
+import "bytes"
 import "../terminal"
+
 
 type Editor interface {
   Open(path string)
@@ -38,7 +40,7 @@ type NanaoEditor struct {
 
 type Row struct {
   number uint32
-  content string
+  content *bytes.Buffer
   size int
 }
 

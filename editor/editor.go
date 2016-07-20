@@ -3,9 +3,11 @@ package editor
 import "os"
 import "fmt"
 import "bufio"
+import "bytes"
 import "strconv"
 import "unsafe"
 import "syscall"
+
 import "../terminal"
 
 
@@ -22,13 +24,13 @@ func (e *NanaoEditor) Open(path string) {
   e.file = file
 
   var rowNum uint32 = 0
-  var content string
+  var content *bytes.Buffer
 
   scanner := bufio.NewScanner(file)
   for scanner.Scan() {
     rowNum++
-    content = scanner.Text()
-    e.rows = append(e.rows, Row{rowNum, content, len(content)})
+    content = bytes.NewBufferString(scanner.Text())
+    e.rows = append(e.rows, Row{rowNum, content, content.Len()})
   }
 
   e.file.Close()
@@ -50,10 +52,15 @@ func (e *NanaoEditor) RefreshScreen() {
   output += "\x1b[?25l" /* Hide cursor. */
   output += "\x1b[H" /* Go home. */
   numOfRows := len(e.rows)
+  /* looks too complicated ?*/
+  numOfRowsOffset := len(strconv.Itoa(numOfRows)) + 1 /* + 1 for the '|' */
+  e.cursorXOffset = numOfRowsOffset + 2
+  lineFormat := "%"+ strconv.Itoa(numOfRowsOffset) +"d|%s\x1b[38m\x1b[0K"
 
   for i := 0; i < numOfRows; i++ {
     row = e.rows[i]
-    output += row.content + "\x1b[39m" + "\x1b[0K"
+    output += fmt.Sprintf(lineFormat, i+1, row.content.String())
+    // output += strconv.Itoa(i+1) + "| " + row.content.String() + "\x1b[39m" + "\x1b[0K"
 
     if i < numOfRows - 1 {
       output += "\r\n"
@@ -63,9 +70,12 @@ func (e *NanaoEditor) RefreshScreen() {
   x := strconv.Itoa(int(e.cursorXPos))
   y := strconv.Itoa(int(e.cursorYPos))
 
-  output +=  "\r\nmoving cursor x: " + x + " y: " +  y + "|| " + "x1b["+y+";"+x+"f"
+  output += "\r\nCursor x: " + x + " y: " +  y + " | "
+  output += "lines: " + strconv.Itoa(e.totalRowsNum) + " | "
+  output += "cursorXOffset: " + strconv.Itoa(e.cursorXOffset)
   output += "\x1b["+y+";"+x+"f"
   output += "\x1b[?25h" /* Show cursor. */
+  fmt.Printf("\x1b[2J")
   fmt.Printf("%s", output)
 }
 
