@@ -14,6 +14,7 @@ type Editor interface {
   moveCursorDown()
   moveCursorLeft()
   moveCursorRight()
+  boundCoursorRight()
 
   GetNumOfRows()
   ProcessKeyPress()

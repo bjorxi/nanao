@@ -121,7 +121,8 @@ func (e *NanaoEditor) insertEmptyRow() {
   newBuffer := bytes.NewBuffer(currRowContent[sliceAt:])
   newRow := Row{e.cursorYPos+1, newBuffer, newBuffer.Len()}
 
-  e.rows[e.cursorYPos-1] = Row{e.cursorYPos-1, bytes.NewBuffer(currRowContent[:sliceAt]), 1}
+  e.rows[e.cursorYPos-1] = Row{e.cursorYPos-1, bytes.NewBuffer(currRowContent[:sliceAt]),
+                               bytes.NewBuffer(currRowContent[:sliceAt]).Len()}
 
   rows = append(rows, e.rows[:e.cursorYPos]...)
   rows = append(rows, newRow)
@@ -155,19 +156,23 @@ func (e *NanaoEditor) moveCursor(x, y uint32) {
   e.cursorYPos = y
 }
 
+
 func (e *NanaoEditor) moveCursorUp () {
   if e.cursorYPos <= 1 {
     e.cursorYPos = 1
   } else {
     e.cursorYPos--
-    // fmt.Println("\x1b[1A")
   }
+
+  e.boundCoursorRight()
 }
+
 
 func (e *NanaoEditor) moveCursorDown () {
   e.cursorYPos++
-  // fmt.Println("\x1b[1B")
+  e.boundCoursorRight()
 }
+
 
 func (e *NanaoEditor) moveCursorLeft () {
 
@@ -176,18 +181,23 @@ func (e *NanaoEditor) moveCursorLeft () {
   } else {
     e.cursorXPos--
   }
-  // fmt.Println("\x1b[1D")
 }
+
 
 func (e *NanaoEditor) moveCursorRight () {
   e.cursorXPos++
+  e.boundCoursorRight()
+}
 
-  currRowSize := uint32(e.rows[e.cursorYPos-1].size + e.cursorXOffset - 1)
+
+func (e *NanaoEditor) boundCoursorRight () {
+  currRowSize := uint32(e.rows[e.cursorYPos-1].size + e.cursorXOffset)
 
   if e.cursorXPos >= currRowSize {
     e.cursorXPos = currRowSize
   }
 }
+
 
 func (e *NanaoEditor) GetNumOfRows() {
 
