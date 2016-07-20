@@ -25,11 +25,14 @@ func (e *NanaoEditor) Open(path string) {
   var content *bytes.Buffer
 
   scanner := bufio.NewScanner(file)
+
   for scanner.Scan() {
     rowNum++
     content = bytes.NewBufferString(scanner.Text())
     e.rows = append(e.rows, Row{rowNum, content, content.Len()})
   }
+
+  e.totalRowsNum = len(e.rows)
 
   file.Close()
 }
@@ -82,28 +85,26 @@ func (e *NanaoEditor) ProcessKeyPress() {
   var keyPress int
 
   fmt.Scanf("%c", &keyPress)
-  fmt.Println("Key pressed", keyPress)
+
   switch keyPress {
-  case 3:
-    fmt.Println("^C")
-    terminal.Restore(0, e.termOldState)
-    os.Exit(0)
-  case 10: /* enter */
-    fmt.Println()
-  case 27, 91:
-    return /* #TODO handle this cases more efficient, now it forces screenRefresh */
-  case 68: /* left arrow */
-    e.moveCursorLeft()
-  case 67: /* right arrow */
-    e.moveCursorRight()
-  case 65: /* up arrow */
-    e.moveCursorUp()
-  case 66: /* down arrow */
-    e.moveCursorDown()
     default:
       e.insertChar(keyPress)
+    case 3:
+      fmt.Println("\x1b[2J")
+      terminal.Restore(0, e.termOldState)
+      os.Exit(0)
     case 13: /* enter */
       e.insertEmptyRow()
+    case 27, 91:
+      return /* #TODO handle this cases more efficient, now it forces screenRefresh */
+    case 68: /* left arrow */
+      e.moveCursorLeft()
+    case 67: /* right arrow */
+      e.moveCursorRight()
+    case 65: /* up arrow */
+      e.moveCursorUp()
+    case 66: /* down arrow */
+      e.moveCursorDown()
   }
 }
 
