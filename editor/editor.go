@@ -136,17 +136,18 @@ func (e *NanaoEditor) insertEmptyRow() {
 
 
 func (e *NanaoEditor) insertChar (char int) {
-  currRow := e.rows[0]
-  currRowContent := currRow.content.Bytes()
+  currRow := e.rows[e.cursorYPos-1]
 
+  currRowContent := currRow.content.Bytes()
+  fmt.Fprintf(os.Stderr, "%d | %s", e.cursorYPos-1, currRowContent)
   newBuffer := bytes.NewBuffer(nil)
 
-  newBuffer.Write(currRowContent[:e.cursorXPos])
+  newBuffer.Write(currRowContent[:e.cursorXPos-uint32(e.cursorXOffset)])
   newBuffer.Write([]byte(strconv.Itoa(char)))
-  newBuffer.Write(currRowContent[e.cursorXPos:])
+  newBuffer.Write(currRowContent[e.cursorXPos-uint32(e.cursorXOffset):])
 
-  e.rows[e.cursorYPos].content = newBuffer
-  e.rows[e.cursorYPos].size = newBuffer.Len()
+  e.rows[e.cursorYPos-1].content = newBuffer
+  e.rows[e.cursorYPos-1].size = newBuffer.Len()
   e.moveCursor(e.cursorXPos+1, e.cursorYPos)
 }
 
