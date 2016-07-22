@@ -171,6 +171,11 @@ func (e *NanaoEditor) moveCursorUp () {
 
 func (e *NanaoEditor) moveCursorDown () {
   e.cursorYPos++
+
+  if (e.cursorYPos >= uint32(e.totalRowsNum)) {
+    e.cursorYPos = uint32(e.totalRowsNum)
+  }
+
   e.boundCoursorRight()
 }
 
