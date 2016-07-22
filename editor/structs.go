@@ -23,13 +23,13 @@ type Editor interface {
 
 
 type NanaoEditor struct {
-  cursorXPos uint32 /* cursor x position */
-  cursorYPos uint32 /* cursor y position */
+  cursorXPos int /* cursor x position */
+  cursorYPos int /* cursor y position */
   cursorXOffset int
-  screenRows int32 /* Number of rows */
-  screenCols int32 /* Number of columns */
-  rowsOffset int32
-  colsOffset int32
+  screenRows int /* Number of rows */
+  screenCols int /* Number of columns */
+  rowsOffset int
+  colsOffset int
   isChanged bool /* Has a file been changed? */
   fileName string
   filePath string
@@ -40,7 +40,7 @@ type NanaoEditor struct {
 
 
 type Row struct {
-  number uint32
+  number int
   content *bytes.Buffer
   size int
 }

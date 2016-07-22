@@ -21,7 +21,7 @@ func (e *NanaoEditor) Open(path string) {
     os.Exit(1)
   }
 
-  var rowNum uint32 = 0
+  var rowNum int = 0
   var content *bytes.Buffer
 
   scanner := bufio.NewScanner(file)
@@ -55,7 +55,7 @@ func (e *NanaoEditor) RefreshScreen() {
   numOfRows := len(e.rows)
 
   /* looks too complicated ?*/
-  numOfRowsOffset := len(strconv.Itoa(numOfRows)) + 1 /* + 1 for the '|' */
+  numOfRowsOffset := len(strconv.Itoa(numOfRows)) /* + 1 for the '|' */
   e.cursorXOffset = numOfRowsOffset + 2
   lineFormat := "%"+ strconv.Itoa(numOfRowsOffset) +"d|%s\x1b[38m\x1b[0K"
 
@@ -117,7 +117,7 @@ func (e *NanaoEditor) insertEmptyRow() {
 
   currRow := e.rows[e.cursorYPos-1]
   currRowContent := currRow.content.Bytes()
-  sliceAt := e.cursorXPos - uint32(e.cursorXOffset)
+  sliceAt := e.cursorXPos - e.cursorXOffset
 
   newBuffer := bytes.NewBuffer(currRowContent[sliceAt:])
   newRow := Row{e.cursorYPos, newBuffer, newBuffer.Len()}
@@ -131,12 +131,12 @@ func (e *NanaoEditor) insertEmptyRow() {
 
   /* looks too complicated ?*/
   numOfRows := len(rows)
-  numOfRowsOffset := len(strconv.Itoa(numOfRows)) + 1 /* + 1 for the '|' */
+  numOfRowsOffset := len(strconv.Itoa(numOfRows)) /* + 1 for the '|' */
   e.cursorXOffset = numOfRowsOffset + 2
 
   e.rows = rows
   e.totalRowsNum++
-  e.moveCursor(uint32(e.cursorXOffset), e.cursorYPos+1)
+  e.moveCursor(e.cursorXOffset, e.cursorYPos+1)
 }
 
 
@@ -146,9 +146,9 @@ func (e *NanaoEditor) insertChar (char int) {
   currRowContent := currRow.content.Bytes()
   newBuffer := bytes.NewBuffer(nil)
 
-  newBuffer.Write(currRowContent[:e.cursorXPos-uint32(e.cursorXOffset)])
+  newBuffer.Write(currRowContent[:e.cursorXPos-e.cursorXOffset])
   newBuffer.Write([]byte(strconv.Itoa(char)))
-  newBuffer.Write(currRowContent[e.cursorXPos-uint32(e.cursorXOffset):])
+  newBuffer.Write(currRowContent[e.cursorXPos-e.cursorXOffset:])
 
   e.rows[e.cursorYPos-1].content = newBuffer
   e.rows[e.cursorYPos-1].size = newBuffer.Len()
@@ -156,7 +156,7 @@ func (e *NanaoEditor) insertChar (char int) {
 }
 
 
-func (e *NanaoEditor) moveCursor(x, y uint32) {
+func (e *NanaoEditor) moveCursor(x, y int) {
   e.cursorXPos = x
   e.cursorYPos = y
 }
@@ -176,8 +176,8 @@ func (e *NanaoEditor) moveCursorUp () {
 func (e *NanaoEditor) moveCursorDown () {
   e.cursorYPos++
 
-  if (e.cursorYPos >= uint32(e.totalRowsNum)) {
-    e.cursorYPos = uint32(e.totalRowsNum)
+  if e.cursorYPos >= e.totalRowsNum {
+    e.cursorYPos = e.totalRowsNum
   }
 
   e.boundCoursorRight()
@@ -186,8 +186,8 @@ func (e *NanaoEditor) moveCursorDown () {
 
 func (e *NanaoEditor) moveCursorLeft () {
 
-  if e.cursorXPos <= uint32(e.cursorXOffset) {
-    e.cursorXPos = uint32(e.cursorXOffset)
+  if e.cursorXPos <= e.cursorXOffset {
+    e.cursorXPos = e.cursorXOffset
   } else {
     e.cursorXPos--
   }
@@ -201,7 +201,7 @@ func (e *NanaoEditor) moveCursorRight () {
 
 
 func (e *NanaoEditor) boundCoursorRight () {
-  currRowSize := uint32(e.rows[e.cursorYPos-1].size + e.cursorXOffset)
+  currRowSize := e.rows[e.cursorYPos-1].size + e.cursorXOffset
 
   if e.cursorXPos >= currRowSize {
     e.cursorXPos = currRowSize
@@ -230,15 +230,15 @@ func (e NanaoEditor) getWingowSize() {
       panic(errno)
   }
 
-  e.screenCols = int32(ws.col)
-  e.screenRows = int32(ws.row)
+  e.screenCols = int(ws.col)
+  e.screenRows = int(ws.row)
 }
 
 
 func Init() Editor {
   e := &NanaoEditor{}
   e.cursorXOffset = 4
-  e.cursorXPos = uint32(e.cursorXOffset)
+  e.cursorXPos = e.cursorXOffset
   e.cursorYPos = 1
   e.getWingowSize()
   e.isChanged = false
