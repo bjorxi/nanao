@@ -53,6 +53,7 @@ func (e *NanaoEditor) RefreshScreen() {
   output += "\x1b[?25l" /* Hide cursor. */
   output += "\x1b[H" /* Go home. */
   numOfRows := len(e.rows)
+
   /* looks too complicated ?*/
   numOfRowsOffset := len(strconv.Itoa(numOfRows)) + 1 /* + 1 for the '|' */
   e.cursorXOffset = numOfRowsOffset + 2
@@ -61,7 +62,6 @@ func (e *NanaoEditor) RefreshScreen() {
   for i := 0; i < numOfRows; i++ {
     row = e.rows[i]
     output += fmt.Sprintf(lineFormat, i+1, row.content.String())
-    // output += strconv.Itoa(i+1) + "| " + row.content.String() + "\x1b[39m" + "\x1b[0K"
 
     if i < numOfRows - 1 {
       output += "\r\n"
@@ -77,6 +77,7 @@ func (e *NanaoEditor) RefreshScreen() {
   output += "\r\nLine size " + strconv.Itoa(e.rows[e.cursorYPos-1].content.Len()) + "(" +
             strconv.Itoa(e.rows[e.cursorYPos-1].size) + ")"
   output += "\x1b["+y+";"+x+"f"
+
   output += "\x1b[?25h" /* Show cursor. */
   fmt.Printf("\x1b[2J")
   fmt.Printf("%s", output)
@@ -119,7 +120,7 @@ func (e *NanaoEditor) insertEmptyRow() {
   sliceAt := e.cursorXPos - uint32(e.cursorXOffset)
 
   newBuffer := bytes.NewBuffer(currRowContent[sliceAt:])
-  newRow := Row{e.cursorYPos+1, newBuffer, newBuffer.Len()}
+  newRow := Row{e.cursorYPos, newBuffer, newBuffer.Len()}
 
   e.rows[e.cursorYPos-1] = Row{e.cursorYPos-1, bytes.NewBuffer(currRowContent[:sliceAt]),
                                bytes.NewBuffer(currRowContent[:sliceAt]).Len()}
@@ -143,7 +144,6 @@ func (e *NanaoEditor) insertChar (char int) {
   currRow := e.rows[e.cursorYPos-1]
 
   currRowContent := currRow.content.Bytes()
-  fmt.Fprintf(os.Stderr, "%d | %s", e.cursorYPos-1, currRowContent)
   newBuffer := bytes.NewBuffer(nil)
 
   newBuffer.Write(currRowContent[:e.cursorXPos-uint32(e.cursorXOffset)])
