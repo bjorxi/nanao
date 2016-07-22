@@ -128,9 +128,13 @@ func (e *NanaoEditor) insertEmptyRow() {
   rows = append(rows, newRow)
   rows = append(rows, e.rows[e.cursorYPos:]...)
 
+  /* looks too complicated ?*/
+  numOfRows := len(rows)
+  numOfRowsOffset := len(strconv.Itoa(numOfRows)) + 1 /* + 1 for the '|' */
+  e.cursorXOffset = numOfRowsOffset + 2
+
   e.rows = rows
   e.totalRowsNum++
-
   e.moveCursor(uint32(e.cursorXOffset), e.cursorYPos+1)
 }
 
