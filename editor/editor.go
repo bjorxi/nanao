@@ -163,6 +163,35 @@ func (e *NanaoEditor) insertEmptyRow() {
 }
 
 
+func (e *NanaoEditor) deleteRow () {
+  /* #TODO Replace magic number with constant/variable */
+  if e.cursorYPos == 1 {
+    return
+  }
+
+  var rows []Row
+
+  currRow := e.rows[e.cursorYPos-1]
+  prevRow := e.rows[e.cursorYPos-2]
+  currRowContent := currRow.content.Bytes()
+
+  e.moveCursor(prevRow.content.Len()+e.cursorXOffset, e.cursorYPos-1)
+
+  prevRow.content.Write(currRowContent)
+  prevRow.size = prevRow.content.Len()
+  rows = append(rows, e.rows[:e.cursorYPos]...)
+  rows = append(rows, e.rows[e.cursorYPos+1:]...)
+
+  /* looks too complicated ?*/
+  numOfRows := len(rows)
+  numOfRowsOffset := len(strconv.Itoa(numOfRows)) /* + 1 for the '|' */
+  e.cursorXOffset = numOfRowsOffset + 2
+
+  e.rows = rows
+  e.totalRowsNum--
+}
+
+
 func (e *NanaoEditor) insertChar (char string) {
   currRow := e.rows[e.cursorYPos-1]
 
@@ -180,6 +209,11 @@ func (e *NanaoEditor) insertChar (char string) {
 
 
 func (e *NanaoEditor) deleteChar() {
+  if e.cursorXPos == e.cursorXOffset {
+    e.deleteRow()
+    return
+  }
+
   currRow := e.rows[e.cursorYPos-1]
 
   currRowContent := currRow.content.Bytes()
@@ -243,7 +277,7 @@ func (e *NanaoEditor) moveCursorRight () {
 
 
 func (e *NanaoEditor) boundCoursorRight () {
-  currRowSize := e.rows[e.cursorYPos-1].size + e.cursorXOffset
+  currRowSize := e.rows[e.cursorYPos-1].content.Len() + e.cursorXOffset
 
   if e.cursorXPos >= currRowSize {
     e.cursorXPos = currRowSize
