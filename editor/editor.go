@@ -140,14 +140,14 @@ func (e *NanaoEditor) insertEmptyRow() {
 }
 
 
-func (e *NanaoEditor) insertChar (char int) {
+func (e *NanaoEditor) insertChar (char string) {
   currRow := e.rows[e.cursorYPos-1]
 
   currRowContent := currRow.content.Bytes()
   newBuffer := bytes.NewBuffer(nil)
 
   newBuffer.Write(currRowContent[:e.cursorXPos-e.cursorXOffset])
-  newBuffer.Write([]byte(strconv.Itoa(char)))
+  newBuffer.Write([]byte(char))
   newBuffer.Write(currRowContent[e.cursorXPos-e.cursorXOffset:])
 
   e.rows[e.cursorYPos-1].content = newBuffer
