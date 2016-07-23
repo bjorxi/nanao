@@ -41,7 +41,7 @@ func (e *NanaoEditor) Open(path string) {
 func (e *NanaoEditor) Edit() {
   for {
     e.RefreshScreen()
-    e.ProcessKeyPress()
+    e.ProcessKeyboardInput()
   }
 }
 
@@ -84,33 +84,56 @@ func (e *NanaoEditor) RefreshScreen() {
 }
 
 
-func (e *NanaoEditor) ProcessKeyPress() {
-  var keyPress int
+/**
+ * 27 91 51 126 - backspace
+ */
+func (e *NanaoEditor) ProcessKeyboardInput() {
+  var input []byte = make([]byte, 4)
 
-  fmt.Scanf("%c", &keyPress)
+  os.Stdin.Read(input)
 
-  switch keyPress {
-    default:
-      e.insertChar(keyPress)
-    case 3:
+  fmt.Fprintf(os.Stderr, "%d %d %d %d\n", input[0],input[1],input[2],input[3])
+
+
+  if input[1] == 0 && input[2] == 0 {
+    key := input[0]
+    if key == 3 {  /* ctrl-c */
       fmt.Println("\x1b[2J")
       terminal.Restore(0, e.termOldState)
       os.Exit(0)
-    case 13: /* enter */
+    } else if key == 13 { /* enter */
       e.insertEmptyRow()
-    case 27, 91:
-      return /* #TODO handle this cases more efficient, now it forces screenRefresh */
-    case 68: /* left arrow */
-      e.moveCursorLeft()
-    case 67: /* right arrow */
-      e.moveCursorRight()
-    case 65: /* up arrow */
-      e.moveCursorUp()
-    case 66: /* down arrow */
-      e.moveCursorDown()
+    } else if key == 27 { /* ESC */
+      return
+    } else if key == 32 {
+      e.insertChar(string(" "))
+    } else if key >= 33 && key <= 126 {
+      e.insertChar(string(input[0]))
+    } else if key == 127 { /* DELETE */
+      e.deleteChar()
+    } else {
+      return
+    }
   }
-}
 
+  if input[0] == 27 {
+    if input[1] == 91 {
+      if input[2] == 68 {
+        e.moveCursorLeft()
+      } else if input[2] == 67 {
+        e.moveCursorRight()
+      } else if input[2] == 66 {
+        e.moveCursorDown()
+      } else if input[2] == 65 {
+        e.moveCursorUp()
+      } else {
+        return
+      }
+    }
+  }
+
+  return
+}
 
 func (e *NanaoEditor) insertEmptyRow() {
   var rows []Row

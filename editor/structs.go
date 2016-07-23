@@ -8,16 +8,15 @@ type Editor interface {
   Open(path string)
   GetFilePath() string
   RefreshScreen()
+  ProcessKeyboardInput()
   Edit()
+  GetNumOfRows()
 
   moveCursorUp()
   moveCursorDown()
   moveCursorLeft()
   moveCursorRight()
   boundCoursorRight()
-
-  GetNumOfRows()
-  ProcessKeyPress()
   getWingowSize()
 }
 
