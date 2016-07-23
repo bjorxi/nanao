@@ -156,6 +156,25 @@ func (e *NanaoEditor) insertChar (char int) {
 }
 
 
+func (e *NanaoEditor) deleteChar() {
+  currRow := e.rows[e.cursorYPos-1]
+
+  currRowContent := currRow.content.Bytes()
+  newBuffer := bytes.NewBuffer(nil)
+
+  if e.cursorXPos <= e.cursorXOffset {
+    return
+  }
+
+  newBuffer.Write(currRowContent[:e.cursorXPos-e.cursorXOffset-1])
+  newBuffer.Write(currRowContent[e.cursorXPos-e.cursorXOffset:])
+
+  e.rows[e.cursorYPos-1].content = newBuffer
+  e.rows[e.cursorYPos-1].size = newBuffer.Len()
+  e.moveCursor(e.cursorXPos-1, e.cursorYPos)
+}
+
+
 func (e *NanaoEditor) moveCursor(x, y int) {
   e.cursorXPos = x
   e.cursorYPos = y
