@@ -279,7 +279,7 @@ func (e NanaoEditor) getWingowSize() {
 
 func Init() Editor {
   e := &NanaoEditor{}
-  e.cursorXOffset = 4
+  e.cursorXOffset = 3
   e.cursorXPos = e.cursorXOffset
   e.cursorYPos = 1
   e.getWingowSize()
