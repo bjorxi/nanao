@@ -52,18 +52,14 @@ func (e *NanaoEditor) RefreshScreen() {
   output := "" /* #TODO replace string with bytes.Buffer */
   output += "\x1b[?25l" /* Hide cursor. */
   output += "\x1b[H" /* Go home. */
-  numOfRows := len(e.rows)
 
-  /* looks too complicated ?*/
-  numOfRowsOffset := len(strconv.Itoa(numOfRows)) /* + 1 for the '|' */
-  e.cursorXOffset = numOfRowsOffset + 2
-  lineFormat := "%"+ strconv.Itoa(numOfRowsOffset) +"d|%s\x1b[38m\x1b[0K"
+  lineFormat := "%"+ strconv.Itoa(e.cursorXOffset-2) +"d|%s\x1b[38m\x1b[0K"
 
-  for i := 0; i < numOfRows; i++ {
+  for i := 0; i < e.totalRowsNum; i++ {
     row = e.rows[i]
     output += fmt.Sprintf(lineFormat, i+1, row.content.String())
 
-    if i < numOfRows - 1 {
+    if i < e.totalRowsNum - 1 {
       output += "\r\n"
     }
   }
@@ -71,7 +67,7 @@ func (e *NanaoEditor) RefreshScreen() {
   x := strconv.Itoa(int(e.cursorXPos))
   y := strconv.Itoa(int(e.cursorYPos))
 
-  output += "\r\nCursor x: " + x + " y: " +  y + " | "
+  output += "\r\n\r\nCursor x: " + x + " y: " +  y + " | "
   output += "lines: " + strconv.Itoa(e.totalRowsNum) + " | "
   output += "cursorXOffset: " + strconv.Itoa(e.cursorXOffset)
   output += "\r\nLine size " + strconv.Itoa(e.rows[e.cursorYPos-1].content.Len()) + "(" +
@@ -229,59 +225,6 @@ func (e *NanaoEditor) deleteChar() {
   e.rows[e.cursorYPos-1].content = newBuffer
   e.rows[e.cursorYPos-1].size = newBuffer.Len()
   e.moveCursor(e.cursorXPos-1, e.cursorYPos)
-}
-
-
-func (e *NanaoEditor) moveCursor(x, y int) {
-  e.cursorXPos = x
-  e.cursorYPos = y
-}
-
-
-func (e *NanaoEditor) moveCursorUp () {
-  if e.cursorYPos <= 1 {
-    e.cursorYPos = 1
-  } else {
-    e.cursorYPos--
-  }
-
-  e.boundCoursorRight()
-}
-
-
-func (e *NanaoEditor) moveCursorDown () {
-  e.cursorYPos++
-
-  if e.cursorYPos >= e.totalRowsNum {
-    e.cursorYPos = e.totalRowsNum
-  }
-
-  e.boundCoursorRight()
-}
-
-
-func (e *NanaoEditor) moveCursorLeft () {
-
-  if e.cursorXPos <= e.cursorXOffset {
-    e.cursorXPos = e.cursorXOffset
-  } else {
-    e.cursorXPos--
-  }
-}
-
-
-func (e *NanaoEditor) moveCursorRight () {
-  e.cursorXPos++
-  e.boundCoursorRight()
-}
-
-
-func (e *NanaoEditor) boundCoursorRight () {
-  currRowSize := e.rows[e.cursorYPos-1].content.Len() + e.cursorXOffset
-
-  if e.cursorXPos >= currRowSize {
-    e.cursorXPos = currRowSize
-  }
 }
 
 
