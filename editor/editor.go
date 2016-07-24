@@ -28,12 +28,14 @@ func (e *NanaoEditor) Open(path string) {
 
   for scanner.Scan() {
     rowNum++
+    /* #TODO use NewBuffer(scanner.Bytes())*/
     content = bytes.NewBufferString(scanner.Text())
     e.rows = append(e.rows, Row{rowNum, content, content.Len()})
   }
 
-  e.totalRowsNum = len(e.rows)
-
+  e.totalRowsNum = rowNum
+  e.setCursorXOffset()
+  e.cursorXPos += e.cursorXOffset
   file.Close()
 }
 
@@ -148,13 +150,9 @@ func (e *NanaoEditor) insertEmptyRow() {
   rows = append(rows, newRow)
   rows = append(rows, e.rows[e.cursorYPos:]...)
 
-  /* looks too complicated ?*/
-  numOfRows := len(rows)
-  numOfRowsOffset := len(strconv.Itoa(numOfRows)) /* + 1 for the '|' */
-  e.cursorXOffset = numOfRowsOffset + 2
-
   e.rows = rows
   e.totalRowsNum++
+  e.setCursorXOffset()
   e.moveCursor(e.cursorXOffset, e.cursorYPos+1)
 }
 
@@ -178,13 +176,9 @@ func (e *NanaoEditor) deleteRow () {
   rows = append(rows, e.rows[:e.cursorYPos]...)
   rows = append(rows, e.rows[e.cursorYPos+1:]...)
 
-  /* looks too complicated ?*/
-  numOfRows := len(rows)
-  numOfRowsOffset := len(strconv.Itoa(numOfRows)) /* + 1 for the '|' */
-  e.cursorXOffset = numOfRowsOffset + 2
-
   e.rows = rows
   e.totalRowsNum--
+  e.setCursorXOffset()
 }
 
 
@@ -256,8 +250,6 @@ func (e NanaoEditor) getWingowSize() {
 
 func Init() Editor {
   e := &NanaoEditor{}
-  e.cursorXOffset = 3
-  e.cursorXPos = e.cursorXOffset
   e.cursorYPos = 1
   e.getWingowSize()
   e.isChanged = false
