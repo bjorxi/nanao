@@ -101,6 +101,10 @@ func (e *NanaoEditor) ProcessKeyboardInput() {
       os.Exit(0)
     } else if key == 13 { /* enter */
       e.insertEmptyRow()
+    } else if key == 17 { /* ctrl-q */
+      fmt.Println("\x1b[2J")
+      terminal.Restore(0, e.termOldState)
+      os.Exit(0)
     } else if key == 27 { /* ESC */
       return
     } else if key == 32 {
