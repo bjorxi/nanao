@@ -101,6 +101,12 @@ func (e *NanaoEditor) ProcessKeyboardInput() {
       os.Exit(0)
     } else if key == 13 { /* enter */
       e.insertEmptyRow()
+    } else if key == 17 { /* ctrl-q */
+      fmt.Println("\x1b[2J")
+      terminal.Restore(0, e.termOldState)
+      os.Exit(0)
+    } else if key == 19 { /* ctrl-s*/
+      e.SaveChanges()
     } else if key == 27 { /* ESC */
       return
     } else if key == 32 {
@@ -132,6 +138,33 @@ func (e *NanaoEditor) ProcessKeyboardInput() {
 
   return
 }
+
+
+func (e *NanaoEditor) SaveChanges () {
+  perms, err := os.Stat(e.filePath)
+  var outputLine string
+
+  if err != nil {
+    fmt.Println("Error saving file")
+    return
+  }
+
+  filePerms := os.FileMode(perms.Mode())
+  file, err := os.OpenFile(e.filePath, os.O_WRONLY | os.O_TRUNC, filePerms)
+
+  if err != nil {
+    fmt.Println("Error saving file")
+    return
+  }
+
+  for i := 0; i < e.totalRowsNum; i++ {
+    outputLine = e.rows[i].content.String() + "\n"
+    file.WriteString(outputLine)
+  }
+
+  file.Close()
+}
+
 
 func (e *NanaoEditor) insertEmptyRow() {
   var rows []Row
