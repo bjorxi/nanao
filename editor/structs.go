@@ -11,6 +11,7 @@ type Editor interface {
   ProcessKeyboardInput()
   Edit()
   GetNumOfRows()
+  SaveChanges()
 
   moveCursorUp()
   moveCursorDown()
