@@ -14,29 +14,45 @@ import "../terminal"
 // #TODO create a file if it doesn't exist
 func (e *NanaoEditor) Open(path string) {
   e.filePath = path
-  file, err := os.Open(path)
 
-  if err != nil {
-    fmt.Println("Error opening file")
-    os.Exit(1)
-  }
-
+  var file *os.File
+  var err error
   var rowNum int = 0
   var content *bytes.Buffer
 
-  scanner := bufio.NewScanner(file)
+  if fileExists(path) {
+    file, err = os.Open(path)
 
-  for scanner.Scan() {
-    rowNum++
-    /* #TODO use NewBuffer(scanner.Bytes())*/
-    content = bytes.NewBufferString(scanner.Text())
-    e.rows = append(e.rows, Row{rowNum, content, content.Len()})
+    if err != nil {
+      fmt.Println("Error opening file", err)
+      os.Exit(1)
+    }
+
+    scanner := bufio.NewScanner(file)
+
+    for scanner.Scan() {
+      rowNum++
+      /* #TODO use NewBuffer(scanner.Bytes())*/
+      content = bytes.NewBufferString(scanner.Text())
+      e.rows = append(e.rows, Row{rowNum, content, content.Len()})
+    }
+
+    if rowNum == 0 {
+      content = bytes.NewBuffer(nil)
+      e.rows = append(e.rows, Row{1, content, content.Len()})
+      rowNum = 1
+    }
+
+    file.Close()
+  } else {
+    content = bytes.NewBuffer(nil)
+    e.rows = append(e.rows, Row{1, content, content.Len()})
+    rowNum = 1
   }
 
   e.totalRowsNum = rowNum
   e.setCursorXOffset()
   e.cursorXPos += e.cursorXOffset
-  file.Close()
 }
 
 
@@ -66,8 +82,8 @@ func (e *NanaoEditor) RefreshScreen() {
     }
   }
 
-  x := strconv.Itoa(int(e.cursorXPos))
-  y := strconv.Itoa(int(e.cursorYPos))
+  x := strconv.Itoa(e.cursorXPos)
+  y := strconv.Itoa(e.cursorYPos)
 
   output += "\r\n\r\nCursor x: " + x + " y: " +  y + " | "
   output += "lines: " + strconv.Itoa(e.totalRowsNum) + " | "
@@ -90,7 +106,7 @@ func (e *NanaoEditor) ProcessKeyboardInput() {
 
   os.Stdin.Read(input)
 
-  fmt.Fprintf(os.Stderr, "%d %d %d %d\n", input[0],input[1],input[2],input[3])
+  //fmt.Fprintf(os.Stderr, "%d %d %d %d\n", input[0],input[1],input[2],input[3])
 
 
   if input[1] == 0 && input[2] == 0 {
@@ -141,20 +157,22 @@ func (e *NanaoEditor) ProcessKeyboardInput() {
 
 
 func (e *NanaoEditor) SaveChanges () {
-  perms, err := os.Stat(e.filePath)
   var outputLine string
+  var file *os.File
+  var err error
+  var fileInfo os.FileInfo
 
-  if err != nil {
-    fmt.Println("Error saving file")
-    return
-  }
+  if !fileExists(e.filePath) {
+    file, err = os.OpenFile(e.filePath, os.O_WRONLY|os.O_CREATE, 0644)
+  } else {
+    fileInfo, err = os.Stat(e.filePath)
+    filePerms := os.FileMode(fileInfo.Mode())
+    file, err = os.OpenFile(e.filePath, os.O_WRONLY | os.O_TRUNC, filePerms)
 
-  filePerms := os.FileMode(perms.Mode())
-  file, err := os.OpenFile(e.filePath, os.O_WRONLY | os.O_TRUNC, filePerms)
-
-  if err != nil {
-    fmt.Println("Error saving file")
-    return
+    if err != nil {
+      fmt.Println("Error saving file")
+      return
+    }
   }
 
   for i := 0; i < e.totalRowsNum; i++ {
