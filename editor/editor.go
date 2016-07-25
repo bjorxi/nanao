@@ -283,7 +283,7 @@ func (e *NanaoEditor) GetFilePath() string {
 }
 
 
-func (e NanaoEditor) getWingowSize() {
+func (e *NanaoEditor) getWindowSize() {
   ws := &winsize{}
   retCode, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
       uintptr(syscall.Stdin),
@@ -301,8 +301,8 @@ func (e NanaoEditor) getWingowSize() {
 
 func Init() Editor {
   e := &NanaoEditor{}
+  e.getWindowSize()
   e.cursorYPos = 1
-  e.getWingowSize()
   e.isChanged = false
   e.termOldState, _ = terminal.MakeRaw(0)
   return e

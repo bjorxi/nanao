@@ -18,7 +18,7 @@ type Editor interface {
   moveCursorLeft()
   moveCursorRight()
   boundCoursorRight()
-  getWingowSize()
+  getWindowSize()
 }
 
 
