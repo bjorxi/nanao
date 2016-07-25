@@ -73,7 +73,9 @@ func (e *NanaoEditor) RefreshScreen() {
 
   lineFormat := "%"+ strconv.Itoa(e.cursorXOffset-2) +"d|%s\x1b[38m\x1b[0K"
 
-  for i := 0; i < e.totalRowsNum; i++ {
+  maxScreenRows := e.GetMaxScreenRows()
+  fmt.Fprintf(os.Stderr, "maxScrenRows %d\n", maxScreenRows)
+  for i := e.rowsOffset; i < maxScreenRows; i++ {
     row = e.rows[i]
     output += fmt.Sprintf(lineFormat, i+1, row.content.String())
 
@@ -97,6 +99,16 @@ func (e *NanaoEditor) RefreshScreen() {
   fmt.Printf("%s", output)
 }
 
+
+func (e *NanaoEditor) GetMaxScreenRows () int {
+  maxScreenRows := e.rowsOffset + (e.screenRows - e.reservedRows)
+
+  if (maxScreenRows > e.totalRowsNum) {
+    return e.totalRowsNum
+  }
+
+  return maxScreenRows
+}
 
 /**
  * 27 91 51 126 - backspace
@@ -303,6 +315,8 @@ func Init() Editor {
   e := &NanaoEditor{}
   e.getWindowSize()
   e.cursorYPos = 1
+  e.statusLineRows = 2
+  e.reservedRows = e.statusLineRows
   e.isChanged = false
   e.termOldState, _ = terminal.MakeRaw(0)
   return e
