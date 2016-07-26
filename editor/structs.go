@@ -25,6 +25,8 @@ type Editor interface {
 type NanaoEditor struct {
   cursorXPos int /* cursor x position */
   cursorYPos int /* cursor y position */
+  cursorMaxYPos int
+  cursorMinYPost int
   cursorXOffset int
   screenRows int /* Number of rows */
   screenCols int /* Number of columns */
