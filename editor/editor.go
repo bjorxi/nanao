@@ -217,6 +217,8 @@ func (e *NanaoEditor) insertEmptyRow() {
   e.totalRowsNum++
   e.setCursorXOffset()
   e.moveCursor(e.cursorXOffset, e.cursorYPos+1)
+func (e *NanaoEditor) GetCurrRowNum () int {
+  return e.rowsOffset + e.cursorYPos - 1
 }
 
 
