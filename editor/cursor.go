@@ -17,6 +17,11 @@ func (e *NanaoEditor) moveCursorUp () {
   } else {
     e.cursorYPos--
   }
+  /* #TODO replace magic numbers with constan/variable */
+  if e.cursorYPos <= 1 && e.rowsOffset > 0 {
+    e.rowsOffset--
+    e.cursorYPos = 1
+  }
 
   e.boundCoursorRight()
 }
@@ -27,6 +32,11 @@ func (e *NanaoEditor) moveCursorDown () {
 
   if e.cursorYPos >= e.totalRowsNum {
     e.cursorYPos = e.totalRowsNum
+  }
+
+  if e.cursorYPos >= e.screenRows - e.reservedRows {
+    e.rowsOffset++
+    e.cursorYPos = e.screenRows - e.reservedRows
   }
 
   e.boundCoursorRight()
