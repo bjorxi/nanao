@@ -12,7 +12,7 @@ import "../terminal"
 
 
 // #TODO create a file if it doesn't exist
-func (e *NanaoEditor) Open(path string) {
+func (e *Editor) Open(path string) {
   e.filePath = path
 
   var file *os.File
@@ -56,7 +56,7 @@ func (e *NanaoEditor) Open(path string) {
 }
 
 
-func (e *NanaoEditor) Edit() {
+func (e *Editor) Edit() {
   for {
     e.RefreshScreen()
     e.ProcessKeyboardInput()
@@ -64,7 +64,7 @@ func (e *NanaoEditor) Edit() {
 }
 
 
-func (e *NanaoEditor) RefreshScreen() {
+func (e *Editor) RefreshScreen() {
   var row Row
 
   output := "" /* #TODO replace string with bytes.Buffer */
@@ -100,7 +100,7 @@ func (e *NanaoEditor) RefreshScreen() {
 }
 
 
-func (e *NanaoEditor) GetMaxScreenRows () int {
+func (e *Editor) GetMaxScreenRows () int {
   maxScreenRows := e.rowsOffset + (e.screenRows - e.reservedRows)
 
   if (maxScreenRows > e.totalRowsNum) {
@@ -113,7 +113,7 @@ func (e *NanaoEditor) GetMaxScreenRows () int {
 /**
  * 27 91 51 126 - backspace
  */
-func (e *NanaoEditor) ProcessKeyboardInput() {
+func (e *Editor) ProcessKeyboardInput() {
   var input []byte = make([]byte, 4)
 
   os.Stdin.Read(input)
@@ -168,7 +168,7 @@ func (e *NanaoEditor) ProcessKeyboardInput() {
 }
 
 
-func (e *NanaoEditor) SaveChanges () {
+func (e *Editor) SaveChanges () {
   var outputLine string
   var file *os.File
   var err error
@@ -196,7 +196,7 @@ func (e *NanaoEditor) SaveChanges () {
 }
 
 
-func (e *NanaoEditor) insertEmptyRow() {
+func (e *Editor) insertEmptyRow() {
   var rows []Row
 
   currRow := e.rows[e.cursorYPos-1]
@@ -217,12 +217,14 @@ func (e *NanaoEditor) insertEmptyRow() {
   e.totalRowsNum++
   e.setCursorXOffset()
   e.moveCursor(e.cursorXOffset, e.cursorYPos+1)
-func (e *NanaoEditor) GetCurrRowNum () int {
+}
+
+func (e *Editor) GetCurrRowNum () int {
   return e.rowsOffset + e.cursorYPos - 1
 }
 
 
-func (e *NanaoEditor) deleteRow () {
+func (e *Editor) deleteRow () {
   /* #TODO Replace magic number with constant/variable */
   if e.cursorYPos == 1 {
     return
@@ -247,7 +249,7 @@ func (e *NanaoEditor) deleteRow () {
 }
 
 
-func (e *NanaoEditor) insertChar (char string) {
+func (e *Editor) insertChar (char string) {
   currRow := e.rows[e.cursorYPos-1]
 
   currRowContent := currRow.content.Bytes()
@@ -263,7 +265,7 @@ func (e *NanaoEditor) insertChar (char string) {
 }
 
 
-func (e *NanaoEditor) deleteChar() {
+func (e *Editor) deleteChar() {
   if e.cursorXPos == e.cursorXOffset {
     e.deleteRow()
     return
@@ -287,17 +289,17 @@ func (e *NanaoEditor) deleteChar() {
 }
 
 
-func (e *NanaoEditor) GetNumOfRows() {
+func (e *Editor) GetNumOfRows() {
 
 }
 
 
-func (e *NanaoEditor) GetFilePath() string {
+func (e *Editor) GetFilePath() string {
   return e.filePath
 }
 
 
-func (e *NanaoEditor) getWindowSize() {
+func (e *Editor) getWindowSize() {
   ws := &winsize{}
   retCode, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
       uintptr(syscall.Stdin),
@@ -313,8 +315,8 @@ func (e *NanaoEditor) getWindowSize() {
 }
 
 
-func Init() Editor {
-  e := &NanaoEditor{}
+func Init() *Editor {
+  e := &Editor{}
   e.getWindowSize()
   e.cursorYPos = 1
   e.statusLineRows = 2

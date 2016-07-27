@@ -5,13 +5,13 @@ package editor
 import "strconv"
 
 
-func (e *NanaoEditor) moveCursor(x, y int) {
+func (e *Editor) moveCursor(x, y int) {
   e.cursorXPos = x
   e.cursorYPos = y
 }
 
 
-func (e *NanaoEditor) moveCursorUp () {
+func (e *Editor) moveCursorUp () {
   if e.cursorYPos <= 1 {
     e.cursorYPos = 1
   } else {
@@ -27,7 +27,7 @@ func (e *NanaoEditor) moveCursorUp () {
 }
 
 
-func (e *NanaoEditor) moveCursorDown () {
+func (e *Editor) moveCursorDown () {
   e.cursorYPos++
 
   if e.cursorYPos >= e.totalRowsNum {
@@ -43,7 +43,7 @@ func (e *NanaoEditor) moveCursorDown () {
 }
 
 
-func (e *NanaoEditor) moveCursorLeft () {
+func (e *Editor) moveCursorLeft () {
 
   if e.cursorXPos <= e.cursorXOffset {
     e.cursorXPos = e.cursorXOffset
@@ -53,13 +53,13 @@ func (e *NanaoEditor) moveCursorLeft () {
 }
 
 
-func (e *NanaoEditor) moveCursorRight () {
+func (e *Editor) moveCursorRight () {
   e.cursorXPos++
   e.boundCoursorRight()
 }
 
 
-func (e *NanaoEditor) boundCoursorRight () {
+func (e *Editor) boundCoursorRight () {
   currRowSize := e.rows[e.cursorYPos-1].content.Len() + e.cursorXOffset
 
   if e.cursorXPos >= currRowSize {
@@ -68,7 +68,7 @@ func (e *NanaoEditor) boundCoursorRight () {
 }
 
 
-func (e *NanaoEditor) setCursorXOffset () {
+func (e *Editor) setCursorXOffset () {
   /* looks too complicated ?*/
   e.totalRowsNum = len(e.rows)
   numOfRowsOffset := len(strconv.Itoa(e.totalRowsNum)) /* + 1 for the '|' */
