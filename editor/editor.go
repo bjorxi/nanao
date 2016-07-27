@@ -289,16 +289,6 @@ func (e *Editor) deleteChar() {
 }
 
 
-func (e *Editor) GetNumOfRows() {
-
-}
-
-
-func (e *Editor) GetFilePath() string {
-  return e.filePath
-}
-
-
 func (e *Editor) getWindowSize() {
   ws := &winsize{}
   retCode, _, errno := syscall.Syscall(syscall.SYS_IOCTL,
