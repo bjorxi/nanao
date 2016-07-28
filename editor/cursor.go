@@ -12,15 +12,12 @@ func (e *Editor) moveCursor(x, y int) {
 
 
 func (e *Editor) moveCursorUp () {
-  if e.cursorYPos <= 1 {
-    e.cursorYPos = 1
+  if e.cursorYPos == 1 {
+    if e.rowsOffset > 0 {
+      e.rowsOffset--
+    }
   } else {
     e.cursorYPos--
-  }
-  /* #TODO replace magic numbers with constan/variable */
-  if e.cursorYPos <= 1 && e.rowsOffset > 0 {
-    e.rowsOffset--
-    e.cursorYPos = 1
   }
 
   e.boundCoursorRight()
@@ -28,15 +25,13 @@ func (e *Editor) moveCursorUp () {
 
 
 func (e *Editor) moveCursorDown () {
-  e.cursorYPos++
+  maxCursorYPos := e.screenRows - e.reservedRows
 
-  if e.cursorYPos >= e.totalRowsNum {
-    e.cursorYPos = e.totalRowsNum
-  }
-
-  if e.cursorYPos >= e.screenRows - e.reservedRows {
+  if e.cursorYPos == maxCursorYPos {
     e.rowsOffset++
-    e.cursorYPos = e.screenRows - e.reservedRows
+    e.cursorYPos = maxCursorYPos
+  } else {
+    e.cursorYPos++
   }
 
   e.boundCoursorRight()
