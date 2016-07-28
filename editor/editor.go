@@ -74,7 +74,6 @@ func (e *Editor) RefreshScreen() {
   lineFormat := "%"+ strconv.Itoa(e.cursorXOffset-2) +"d|%s\x1b[38m\x1b[0K"
 
   maxScreenRows := e.GetMaxScreenRows()
-  fmt.Fprintf(os.Stderr, "maxScrenRows %d\n", maxScreenRows)
   for i := e.rowsOffset; i < maxScreenRows; i++ {
     row = e.rows[i]
     output += fmt.Sprintf(lineFormat, i+1, row.content.String())
