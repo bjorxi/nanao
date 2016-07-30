@@ -55,9 +55,11 @@ func (e *Editor) moveCursorRight () {
 
 
 func (e *Editor) boundCoursorRight () {
-  currRowSize := e.rows[e.cursorYPos-1].content.Len() + e.cursorXOffset
+  currRowSize := e.rows[e.GetCurrRowNum()].content.Len() + e.cursorXOffset
 
   if e.cursorXPos >= currRowSize {
+    e.cursorXPos = currRowSize
+  } else {
     e.cursorXPos = currRowSize
   }
 }
