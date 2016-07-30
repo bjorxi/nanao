@@ -225,22 +225,23 @@ func (e *Editor) GetCurrRowNum () int {
 
 func (e *Editor) deleteRow () {
   /* #TODO Replace magic number with constant/variable */
-  if e.cursorYPos == 1 {
+  if e.cursorYPos == 1 && e.rowsOffset == 0 {
     return
   }
 
   var rows []Row
-
-  currRow := e.rows[e.cursorYPos-1]
-  prevRow := e.rows[e.cursorYPos-2]
+  currRowNum := e.GetCurrRowNum()
+  currRow := e.rows[currRowNum]
+  prevRowNum := e.GetCurrRowNum()-1
+  prevRow := e.rows[prevRowNum]
   currRowContent := currRow.content.Bytes()
 
-  e.moveCursor(prevRow.content.Len()+e.cursorXOffset, e.cursorYPos-1)
+  e.moveCursorUp()
 
   prevRow.content.Write(currRowContent)
   prevRow.size = prevRow.content.Len()
-  rows = append(rows, e.rows[:e.cursorYPos]...)
-  rows = append(rows, e.rows[e.cursorYPos+1:]...)
+  rows = append(rows, e.rows[:currRowNum]...)
+  rows = append(rows, e.rows[currRowNum+1:]...)
 
   e.rows = rows
   e.totalRowsNum--
