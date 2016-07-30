@@ -198,19 +198,19 @@ func (e *Editor) SaveChanges () {
 func (e *Editor) insertEmptyRow() {
   var rows []Row
 
-  currRow := e.rows[e.cursorYPos-1]
+  currRow := e.rows[e.GetCurrRowNum()]
   currRowContent := currRow.content.Bytes()
   sliceAt := e.cursorXPos - e.cursorXOffset
 
   newBuffer := bytes.NewBuffer(currRowContent[sliceAt:])
-  newRow := Row{e.cursorYPos, newBuffer, newBuffer.Len()}
+  newRow := Row{e.GetCurrRowNum(), newBuffer, newBuffer.Len()}
 
-  e.rows[e.cursorYPos-1] = Row{e.cursorYPos-1, bytes.NewBuffer(currRowContent[:sliceAt]),
+  e.rows[e.GetCurrRowNum()] = Row{e.cursorYPos-1, bytes.NewBuffer(currRowContent[:sliceAt]),
                                bytes.NewBuffer(currRowContent[:sliceAt]).Len()}
 
-  rows = append(rows, e.rows[:e.cursorYPos]...)
+  rows = append(rows, e.rows[:e.GetCurrRowNum()+1]...)
   rows = append(rows, newRow)
-  rows = append(rows, e.rows[e.cursorYPos:]...)
+  rows = append(rows, e.rows[e.GetCurrRowNum()+1:]...)
 
   e.rows = rows
   e.totalRowsNum++
