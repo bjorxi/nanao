@@ -74,11 +74,12 @@ func (e *Editor) RefreshScreen() {
   lineFormat := "%"+ strconv.Itoa(e.cursorXOffset-2) +"d|%s\x1b[38m\x1b[0K"
 
   maxScreenRows := e.GetMaxScreenRows()
+
   for i := e.rowsOffset; i < maxScreenRows; i++ {
     row = e.rows[i]
     output += fmt.Sprintf(lineFormat, i+1, row.content.String())
 
-    if i < e.totalRowsNum - 1 {
+    if i < maxScreenRows - 1 {
       output += "\r\n"
     }
   }
@@ -97,8 +98,8 @@ func (e *Editor) RefreshScreen() {
 func (e *Editor) GetMaxScreenRows () int {
   maxScreenRows := e.rowsOffset + (e.screenRows - e.reservedRows)
 
-  if (maxScreenRows > e.totalRowsNum) {
-    return e.totalRowsNum
+  if maxScreenRows > e.totalRowsNum {
+    maxScreenRows = e.totalRowsNum
   }
 
   return maxScreenRows
@@ -212,6 +213,7 @@ func (e *Editor) insertEmptyRow() {
   e.setCursorXOffset()
   e.moveCursor(e.cursorXOffset, e.cursorYPos+1)
 }
+
 
 func (e *Editor) GetCurrRowNum () int {
   return e.rowsOffset + e.cursorYPos - 1

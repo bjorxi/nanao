@@ -8,6 +8,13 @@ import "strconv"
 func (e *Editor) moveCursor(x, y int) {
   e.cursorXPos = x
   e.cursorYPos = y
+
+  maxCursorYPos := e.screenRows - e.reservedRows
+
+  if e.cursorYPos > maxCursorYPos {
+    e.rowsOffset++
+    e.cursorYPos = maxCursorYPos
+  }
 }
 
 
