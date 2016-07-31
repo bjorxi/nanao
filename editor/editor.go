@@ -271,7 +271,7 @@ func (e *Editor) deleteChar() {
     return
   }
 
-  currRow := e.rows[e.cursorYPos-1]
+  currRow := e.rows[e.GetCurrRowNum()]
 
   currRowContent := currRow.content.Bytes()
   newBuffer := bytes.NewBuffer(nil)
@@ -283,8 +283,8 @@ func (e *Editor) deleteChar() {
   newBuffer.Write(currRowContent[:e.cursorXPos-e.cursorXOffset-1])
   newBuffer.Write(currRowContent[e.cursorXPos-e.cursorXOffset:])
 
-  e.rows[e.cursorYPos-1].content = newBuffer
-  e.rows[e.cursorYPos-1].size = newBuffer.Len()
+  e.rows[e.GetCurrRowNum()].content = newBuffer
+  e.rows[e.GetCurrRowNum()].size = newBuffer.Len()
   e.moveCursor(e.cursorXPos-1, e.cursorYPos)
 }
 
