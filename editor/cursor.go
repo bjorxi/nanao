@@ -59,8 +59,6 @@ func (e *Editor) boundCoursorRight () {
 
   if e.cursorXPos >= currRowSize {
     e.cursorXPos = currRowSize
-  } else {
-    e.cursorXPos = currRowSize
   }
 }
 
