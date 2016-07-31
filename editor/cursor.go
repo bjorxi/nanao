@@ -5,45 +5,47 @@ package editor
 import "strconv"
 
 
-func (e *NanaoEditor) moveCursor(x, y int) {
+func (e *Editor) moveCursor(x, y int) {
   e.cursorXPos = x
   e.cursorYPos = y
+
+  maxCursorYPos := e.screenRows - e.reservedRows
+
+  if e.cursorYPos > maxCursorYPos {
+    e.rowsOffset++
+    e.cursorYPos = maxCursorYPos
+  }
 }
 
 
-func (e *NanaoEditor) moveCursorUp () {
-  if e.cursorYPos <= 1 {
-    e.cursorYPos = 1
+func (e *Editor) moveCursorUp () {
+  if e.cursorYPos == 1 {
+    if e.rowsOffset > 0 {
+      e.rowsOffset--
+    }
   } else {
     e.cursorYPos--
   }
-  /* #TODO replace magic numbers with constan/variable */
-  if e.cursorYPos <= 1 && e.rowsOffset > 0 {
-    e.rowsOffset--
-    e.cursorYPos = 1
-  }
 
   e.boundCoursorRight()
 }
 
 
-func (e *NanaoEditor) moveCursorDown () {
-  e.cursorYPos++
+func (e *Editor) moveCursorDown () {
+  maxCursorYPos := e.screenRows - e.reservedRows
 
-  if e.cursorYPos >= e.totalRowsNum {
-    e.cursorYPos = e.totalRowsNum
-  }
-
-  if e.cursorYPos >= e.screenRows - e.reservedRows {
+  if e.cursorYPos == maxCursorYPos {
     e.rowsOffset++
-    e.cursorYPos = e.screenRows - e.reservedRows
+    e.cursorYPos = maxCursorYPos
+  } else {
+    e.cursorYPos++
   }
 
   e.boundCoursorRight()
 }
 
 
-func (e *NanaoEditor) moveCursorLeft () {
+func (e *Editor) moveCursorLeft () {
 
   if e.cursorXPos <= e.cursorXOffset {
     e.cursorXPos = e.cursorXOffset
@@ -53,14 +55,14 @@ func (e *NanaoEditor) moveCursorLeft () {
 }
 
 
-func (e *NanaoEditor) moveCursorRight () {
+func (e *Editor) moveCursorRight () {
   e.cursorXPos++
   e.boundCoursorRight()
 }
 
 
-func (e *NanaoEditor) boundCoursorRight () {
-  currRowSize := e.rows[e.cursorYPos-1].content.Len() + e.cursorXOffset
+func (e *Editor) boundCoursorRight () {
+  currRowSize := e.rows[e.GetCurrRowNum()].content.Len() + e.cursorXOffset
 
   if e.cursorXPos >= currRowSize {
     e.cursorXPos = currRowSize
@@ -68,7 +70,7 @@ func (e *NanaoEditor) boundCoursorRight () {
 }
 
 
-func (e *NanaoEditor) setCursorXOffset () {
+func (e *Editor) setCursorXOffset () {
   /* looks too complicated ?*/
   e.totalRowsNum = len(e.rows)
   numOfRowsOffset := len(strconv.Itoa(e.totalRowsNum)) /* + 1 for the '|' */

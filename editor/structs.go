@@ -4,30 +4,14 @@ import "bytes"
 import "../terminal"
 
 
-type Editor interface {
-  Open(path string)
-  GetFilePath() string
-  RefreshScreen()
-  ProcessKeyboardInput()
-  Edit()
-  GetNumOfRows()
-  SaveChanges()
-
-  moveCursorUp()
-  moveCursorDown()
-  moveCursorLeft()
-  moveCursorRight()
-  boundCoursorRight()
-  getWindowSize()
-}
-
-
-type NanaoEditor struct {
+type Editor struct {
   cursorXPos int /* cursor x position */
   cursorYPos int /* cursor y position */
   cursorMaxYPos int
   cursorMinYPost int
   cursorXOffset int
+  reservedRows int
+  statusLineRows int
   screenRows int /* Number of rows */
   screenCols int /* Number of columns */
   rowsOffset int
