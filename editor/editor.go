@@ -86,14 +86,9 @@ func (e *Editor) RefreshScreen() {
   x := strconv.Itoa(e.cursorXPos)
   y := strconv.Itoa(e.cursorYPos)
 
-  output += "Cursor x: " + x + " y: " +  y + " | "
-  output += "lines: " + strconv.Itoa(e.totalRowsNum) + " | "
-  output += "cursorXOffset: " + strconv.Itoa(e.cursorXOffset)
-  output += "\r\nLine size " + strconv.Itoa(e.rows[e.cursorYPos-1].content.Len()) + "(" +
-            strconv.Itoa(e.rows[e.cursorYPos-1].size) + ")"
-  output += "\x1b["+y+";"+x+"f"
-
+  output += "\x1b["+y+";"+x+"f" /* Set cursor position */
   output += "\x1b[?25h" /* Show cursor. */
+
   fmt.Printf("\x1b[2J")
   fmt.Printf("%s", output)
 }
