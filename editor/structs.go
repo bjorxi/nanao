@@ -22,6 +22,7 @@ type Editor struct {
   rows []Row /* File content */
   totalRowsNum int
   termOldState *terminal.State /* TODO: move it somewhere */
+  conf *Config
 }
 
 
@@ -37,4 +38,9 @@ type winsize struct {
   col    uint16
   xpixel uint16
   ypixel uint16
+}
+
+
+type Config struct {
+  tabSize int `json:"tab_size"`
 }

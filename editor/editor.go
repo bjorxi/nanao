@@ -138,6 +138,8 @@ func (e *Editor) ProcessKeyboardInput() {
       e.insertChar(string(input[0]))
     } else if key == 127 { /* DELETE */
       e.deleteChar()
+    } else if key == 9 { /* TAB */
+      e.insertIndent()
     } else {
       return
     }
@@ -188,6 +190,14 @@ func (e *Editor) SaveChanges () {
   }
 
   file.Close()
+}
+
+
+func (e *Editor) insertIndent () {
+  fmt.Fprintf(os.Stderr, "indent %d\n", e.conf.tabSize)
+  for i := 0; i < e.conf.tabSize; i++ {
+    e.insertChar(" ")
+  }
 }
 
 
@@ -304,6 +314,8 @@ func (e *Editor) getWindowSize() {
 
 func Init() *Editor {
   e := &Editor{}
+  e.conf = &Config{}
+  e.ParseConf("~/.nanaoconf")
   e.getWindowSize()
   e.cursorYPos = 1
   e.statusLineRows = 2
