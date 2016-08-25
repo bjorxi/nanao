@@ -138,6 +138,8 @@ func (e *Editor) ProcessKeyboardInput() {
       e.insertChar(string(input[0]))
     } else if key == 127 { /* DELETE */
       e.deleteChar()
+    } else if key == 9 { /* TAB */
+      e.insertIndent()
     } else {
       return
     }
@@ -153,6 +155,10 @@ func (e *Editor) ProcessKeyboardInput() {
         e.moveCursorDown()
       } else if input[2] == 65 {
         e.moveCursorUp()
+      } else if input[2] == 72 {
+        e.moveToLineStart()
+      } else if input[2] == 70 {
+        e.moveToLineEnd()
       } else {
         return
       }
@@ -188,6 +194,13 @@ func (e *Editor) SaveChanges () {
   }
 
   file.Close()
+}
+
+
+func (e *Editor) insertIndent () {
+  for i := 0; i < e.conf.TabSize; i++ {
+    e.insertChar(" ")
+  }
 }
 
 
@@ -306,6 +319,8 @@ func (e *Editor) getWindowSize() {
 
 func Init() *Editor {
   e := &Editor{}
+  e.conf = &Config{}
+  e.ParseConf(os.Getenv("HOME") + "/.nanaoconf")
   e.getWindowSize()
   e.cursorYPos = 1
   e.statusLineRows = 2
