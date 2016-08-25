@@ -198,8 +198,7 @@ func (e *Editor) SaveChanges () {
 
 
 func (e *Editor) insertIndent () {
-  fmt.Fprintf(os.Stderr, "indent %d\n", e.conf.tabSize)
-  for i := 0; i < e.conf.tabSize; i++ {
+  for i := 0; i < e.conf.TabSize; i++ {
     e.insertChar(" ")
   }
 }
