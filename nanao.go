@@ -7,7 +7,7 @@ import (
   "./editor"
 )
 
-const version string = "v0.0.2a"
+const version string = "v0.0.3a"
 
 
 func welcomeMessage () {
