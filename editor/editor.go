@@ -155,6 +155,10 @@ func (e *Editor) ProcessKeyboardInput() {
         e.moveCursorDown()
       } else if input[2] == 65 {
         e.moveCursorUp()
+      } else if input[2] == 72 {
+        e.moveToLineStart()
+      } else if input[2] == 70 {
+        e.moveToLineEnd()
       } else {
         return
       }
