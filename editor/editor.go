@@ -315,7 +315,7 @@ func (e *Editor) getWindowSize() {
 func Init() *Editor {
   e := &Editor{}
   e.conf = &Config{}
-  e.ParseConf("~/.nanaoconf")
+  e.ParseConf(os.Getenv("HOME") + "/.nanaoconf")
   e.getWindowSize()
   e.cursorYPos = 1
   e.statusLineRows = 2
