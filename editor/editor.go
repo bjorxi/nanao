@@ -231,6 +231,7 @@ func (e *Editor) deleteRow () {
   currRow := e.rows[currRowNum]
   prevRowNum := e.GetCurrRowNum()-1
   prevRow := e.rows[prevRowNum]
+  prevRowLen := prevRow.content.Len()
   currRowContent := currRow.content.Bytes()
 
   e.moveCursorUp()
@@ -241,6 +242,7 @@ func (e *Editor) deleteRow () {
   rows = append(rows, e.rows[currRowNum+1:]...)
 
   e.rows = rows
+  e.cursorXPos = prevRowLen + e.cursorXOffset
   e.totalRowsNum--
   e.setCursorXOffset()
 }
