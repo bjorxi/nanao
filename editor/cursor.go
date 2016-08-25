@@ -32,12 +32,13 @@ func (e *Editor) moveCursorUp () {
 
 
 func (e *Editor) moveCursorDown () {
-  maxCursorYPos := e.screenRows - e.reservedRows
+  maxCursorYPos := e.screenRows - e.statusLineRows
+
   if e.cursorYPos >= e.totalRowsNum {
     return
   }
 
-  if e.cursorYPos == maxCursorYPos {
+  if e.cursorYPos >= maxCursorYPos {
     e.rowsOffset++
     e.cursorYPos = maxCursorYPos
   } else {
