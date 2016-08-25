@@ -43,4 +43,5 @@ type winsize struct {
 
 type Config struct {
   tabSize int `json:"tab_size"`
+  translateTabsToSpaces bool `json:"translate_tabs_to_spaces"`
 }
