@@ -4,7 +4,7 @@ package main
 import (
   "os"
   "fmt"
-  "./editor"
+  "github.com/bjorxi/nanao/editor"
 )
 
 const version string = "v0.0.3a"
@@ -41,7 +41,7 @@ func main () {
 
   fileName := os.Args[1]
 
-  e := editor.Init()
+  e := editor.New()
   e.Open(fileName)
   e.Edit()
 }
