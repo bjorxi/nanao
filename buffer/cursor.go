@@ -25,41 +25,39 @@ func (b *Buffer) MoveCursor(x, y int) {
 
 
 func (e *Buffer) MoveCursorUp () {
-  // if e.cursorYPos == 1 {
-  //   if e.rowsOffset > 0 {
-  //     e.rowsOffset--
-  //   }
-  // } else {
-  //   e.cursorYPos--
-  // }
-  //
-  // e.boundCoursorRight()
+  if e.cursorYPos == 1 {
+    if e.rowsOffset > 0 {
+      e.rowsOffset--
+    }
+  } else {
+    e.cursorYPos--
+  }
+
+  e.boundCoursorRight()
 }
 
 
-func (e *Buffer) MoveCursorDown () {
-  // maxCursorYPos := e.screenRows - e.statusLineRows
-  //
-  // if e.cursorYPos >= e.totalRowsNum {
-  //   return
-  // }
-  //
-  // if e.cursorYPos >= maxCursorYPos {
-  //   e.rowsOffset++
-  //   e.cursorYPos = maxCursorYPos
-  // } else {
-  //   e.cursorYPos++
-  // }
-  //
-  // e.boundCoursorRight()
+func (b *Buffer) MoveCursorDown () {
+  if b.cursorYPos >= len(b.rows) {
+    return
+  }
+
+  if b.cursorYPos >= b.maxVisibleRows {
+    b.rowsOffset++
+    b.cursorYPos = b.maxVisibleRows
+  } else {
+    b.cursorYPos++
+  }
+
+  b.boundCoursorRight()
 }
 
 
 func (b *Buffer) MoveCursorLeft () {
+  b.cursorXPos--
+
   if b.cursorXPos <= b.getLineMetaChars() {
-    b.cursorXPos = b.getLineMetaChars()
-  } else {
-    b.cursorXPos--
+    b.cursorXPos = b.getLineMetaChars() + 1
   }
 }
 
@@ -71,7 +69,7 @@ func (e *Buffer) MoveCursorRight () {
 
 
 func (e *Buffer) boundCoursorRight () {
-  currRowSize := e.rows[e.GetCurrRowNum()].content.Len() + e.getLineMetaChars()
+  currRowSize := e.rows[e.GetCurrRowNum()].content.Len() + e.getLineMetaChars() + 1
 
   if e.cursorXPos >= currRowSize {
     e.cursorXPos = currRowSize
@@ -92,6 +90,4 @@ func (b *Buffer) setCursorXOffset () {
   // }
 
   // return b.getLineMetaChars()
-
-
 }
