@@ -48,7 +48,19 @@ func (b *Buffer) getLineMetaChars() int {
 }
 
 func (b *Buffer) getRowEditIndex() int {
-  return b.cursorXPos - b.getLineMetaChars() - 1
+  index := b.cursorXPos - b.getLineMetaChars() - 1
+
+  if index < 0 {
+    index = 0
+  }
+
+  return index
+}
+
+// Returns a min viable position for cursor in a line
+// it's a line number digit + separator + 1
+func (b *Buffer) getCursorMinXPos() int {
+  return b.getLineMetaChars() + 1
 }
 
 
@@ -170,31 +182,32 @@ func (e *Buffer) GetCurrRowNum () int {
 }
 
 
-func (e *Buffer) DeleteRow () {
+func (b *Buffer) DeleteRow () {
   /* #TODO Replace magic number with constant/variable */
-  // if e.cursorYPos == 1 && e.rowsOffset == 0 {
-  //   return
-  // }
-  //
-  // var rows []Row
-  // currRowNum := e.GetCurrRowNum()
-  // currRow := e.rows[currRowNum]
-  // prevRowNum := e.GetCurrRowNum()-1
-  // prevRow := e.rows[prevRowNum]
-  // prevRowLen := prevRow.content.Len()
-  // currRowContent := currRow.content.Bytes()
-  //
-  // e.MoveCursorUp()
-  //
-  // prevRow.content.Write(currRowContent)
-  // prevRow.size = prevRow.content.Len()
-  // rows = append(rows, e.rows[:currRowNum]...)
-  // rows = append(rows, e.rows[currRowNum+1:]...)
-  //
-  // e.rows = rows
-  // e.cursorXPos = prevRowLen + e.cursorXOffset
-  // e.totalRowsNum--
-  // e.setCursorXOffset()
+  if b.cursorYPos == 0 && b.rowsOffset == 0 {
+    return
+  }
+
+  var rows []Row
+  currRowNum := b.GetCurrRowNum()
+  currRow := b.rows[currRowNum]
+  prevRowLen := 0
+
+  if currRowNum >= 1 {
+    prevRowNum := b.GetCurrRowNum()-1
+    prevRow := b.rows[prevRowNum]
+    prevRowLen = prevRow.content.Len()
+    currRowContent := currRow.content.Bytes()
+    prevRow.content.Write(currRowContent)
+    prevRow.size = prevRow.content.Len()
+    rows = append(rows, b.rows[:currRowNum]...)
+    rows = append(rows, b.rows[currRowNum+1:]...)
+  }
+
+  b.rows = rows
+  b.MoveCursorUp()
+  b.cursorXPos = prevRowLen + b.getLineMetaChars()
+  b.setCursorXOffset()
 }
 
 
@@ -206,27 +219,28 @@ func (b *Buffer) InsertChar (char string) {
 }
 
 
-func (e *Buffer) DeleteChar() {
-  // if e.cursorXPos == e.cursorXOffset {
-  //   e.DeleteRow()
-  //   return
-  // }
-  //
-  // currRow := e.rows[e.GetCurrRowNum()]
-  //
-  // currRowContent := currRow.content.Bytes()
-  // newBuffer := bytes.NewBuffer(nil)
-  //
-  // if e.cursorXPos <= e.cursorXOffset {
-  //   return
-  // }
-  //
-  // newBuffer.Write(currRowContent[:e.cursorXPos-e.cursorXOffset-1])
-  // newBuffer.Write(currRowContent[e.cursorXPos-e.cursorXOffset:])
-  //
-  // e.rows[e.GetCurrRowNum()].content = newBuffer
-  // e.rows[e.GetCurrRowNum()].size = newBuffer.Len()
-  // e.MoveCursor(e.cursorXPos-1, e.cursorYPos)
+func (b *Buffer) DeleteChar() {
+  // no chars in a row
+  if b.getRowEditIndex() == 0 {
+    b.DeleteRow()
+    return
+  }
+
+  currRow := b.rows[b.GetCurrRowNum()]
+
+  currRowContent := currRow.content.Bytes()
+  newBuffer := bytes.NewBuffer(nil)
+
+  if b.cursorXPos <= b.getLineMetaChars() {
+    return
+  }
+
+  newBuffer.Write(currRowContent[:b.getRowEditIndex()-1])
+  newBuffer.Write(currRowContent[b.getRowEditIndex():])
+
+  b.rows[b.GetCurrRowNum()].content = newBuffer
+  b.rows[b.GetCurrRowNum()].size = newBuffer.Len()
+  b.MoveCursor(b.cursorXPos-1, b.cursorYPos)
 }
 
 // Calculates max visible row Num

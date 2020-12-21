@@ -25,7 +25,7 @@ func (b *Buffer) MoveCursor(x, y int) {
 
 
 func (e *Buffer) MoveCursorUp () {
-  if e.cursorYPos == 1 {
+  if e.cursorYPos == 0 {
     if e.rowsOffset > 0 {
       e.rowsOffset--
     }
